@@ -1,0 +1,233 @@
+### 🔹 Exception Handling in C# (.NET)
+
+Exception handling is a way to **manage runtime errors** gracefully without crashing the program. When an error occurs, an **exception** is thrown, and you can **catch** it to take appropriate action.
+
+---
+
+## 1️⃣ What is an Exception?
+
+* An **exception** is an object that describes an error or unexpected behavior during program execution.
+* Common examples: division by zero, file not found, null reference.
+
+---
+
+## 2️⃣ Basic Exception Handling Syntax
+
+```csharp
+try
+{
+    // Code that might throw an exception
+}
+catch (ExceptionType ex)
+{
+    // Code to handle the exception
+    Console.WriteLine(ex.Message);
+}
+finally
+{
+    // Code that runs always (optional)
+}
+```
+
+* `try`: Code that might fail.
+* `catch`: Handles the error. Can have multiple catches for different exceptions.
+* `finally`: Runs no matter what, used for cleanup.
+
+---
+
+## 3️⃣ Example
+
+```csharp
+try
+{
+    int a = 10, b = 0;
+    int c = a / b;  // This will throw DivideByZeroException
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("Cannot divide by zero!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("An error occurred: " + ex.Message);
+}
+finally
+{
+    Console.WriteLine("Execution completed.");
+}
+```
+
+Output:
+
+```
+Cannot divide by zero!
+Execution completed.
+```
+
+---
+
+## 4️⃣ Common Exception Classes
+
+| Exception Type             | Description                                    |
+| -------------------------- | ---------------------------------------------- |
+| `Exception`                | Base class for all exceptions                  |
+| `DivideByZeroException`    | Division by zero                               |
+| `NullReferenceException`   | Using a null object reference                  |
+| `IndexOutOfRangeException` | Accessing invalid index in array or collection |
+| `FileNotFoundException`    | When file is missing                           |
+| `FormatException`          | Invalid format for parsing                     |
+
+---
+
+## 5️⃣ Throwing Exceptions
+
+You can **throw** your own exceptions using:
+
+```csharp
+throw new Exception("Something went wrong!");
+```
+
+Or a more specific type:
+
+```csharp
+throw new ArgumentException("Invalid argument!");
+```
+
+---
+
+## 6️⃣ Custom Exceptions
+
+You can create your own exception class by inheriting from `Exception`:
+
+```csharp
+public class MyCustomException : Exception
+{
+    public MyCustomException(string message) : base(message) { }
+}
+```
+
+---
+
+## Summary
+
+| Keyword   | Purpose                                 |
+| --------- | --------------------------------------- |
+| `try`     | Code block to monitor for exceptions    |
+| `catch`   | Handle exceptions thrown in try block   |
+| `finally` | Cleanup code, runs regardless of errors |
+| `throw`   | Raise an exception manually             |
+
+---
+ Let’s dive into some **advanced exception handling concepts** in C# with examples:
+
+---
+
+## 1️⃣ Nested try-catch Blocks
+
+You can nest `try-catch` blocks to handle exceptions at different levels:
+
+```csharp
+try
+{
+    Console.WriteLine("Outer try block");
+
+    try
+    {
+        int[] arr = {1, 2, 3};
+        Console.WriteLine(arr[5]);  // Will throw IndexOutOfRangeException
+    }
+    catch (IndexOutOfRangeException ex)
+    {
+        Console.WriteLine("Inner catch: " + ex.Message);
+    }
+
+    // More code that might throw
+    int x = 10 / 0;  // DivideByZeroException
+}
+catch (DivideByZeroException ex)
+{
+    Console.WriteLine("Outer catch: " + ex.Message);
+}
+```
+
+**Output:**
+
+```
+Outer try block
+Inner catch: Index was outside the bounds of the array.
+Outer catch: Attempted to divide by zero.
+```
+
+---
+
+## 2️⃣ Rethrowing Exceptions
+
+Sometimes you want to catch an exception, do something (like logging), then rethrow it to be handled further up the call stack.
+
+```csharp
+try
+{
+    // Code that throws
+    throw new InvalidOperationException("Invalid operation!");
+}
+catch (InvalidOperationException ex)
+{
+    Console.WriteLine("Logging exception: " + ex.Message);
+    throw;  // Rethrows the same exception
+}
+```
+
+---
+
+## 3️⃣ Best Practices for Exception Handling
+
+* **Catch specific exceptions** before general ones (`Exception`).
+* Avoid empty `catch` blocks — always handle or log the exception.
+* Use `finally` to release resources like files, database connections.
+* Throw **meaningful exceptions** with clear messages.
+* Don’t use exceptions for flow control.
+* Use `using` statement for automatic resource cleanup when possible.
+
+---
+
+## 4️⃣ Using `using` Statement (for IDisposable)
+
+```csharp
+using (var file = new StreamReader("file.txt"))
+{
+    string content = file.ReadToEnd();
+}
+```
+
+This automatically calls `Dispose()` on `file` even if exceptions occur, no need for explicit `finally`.
+
+---
+
+## 5️⃣ Custom Exception with Additional Info
+
+```csharp
+public class MyCustomException : Exception
+{
+    public int ErrorCode { get; }
+    
+    public MyCustomException(string message, int errorCode) : base(message)
+    {
+        ErrorCode = errorCode;
+    }
+}
+```
+
+Usage:
+
+```csharp
+try
+{
+    throw new MyCustomException("Custom error occurred", 404);
+}
+catch (MyCustomException ex)
+{
+    Console.WriteLine($"Error {ex.ErrorCode}: {ex.Message}");
+}
+```
+
+---
